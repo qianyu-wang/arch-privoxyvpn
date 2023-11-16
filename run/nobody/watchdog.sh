@@ -6,6 +6,7 @@ while true; do
 	# reset triggers to negative values
 	privoxy_running="false"
 	microsocks_running="false"
+	singbox_running="false"
 	ip_change="false"
 
 	if [[ "${VPN_ENABLED}" == "yes" ]]; then
