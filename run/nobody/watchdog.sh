@@ -77,6 +77,29 @@ while true; do
 
 			fi
 
+			if [[ "${ENABLE_SINGBOX}" == "yes" ]]; then
+
+				# check if singbox is running, if not then skip shutdown of process
+				if ! pgrep -fa "/home/nobody/sing-box" > /dev/null; then
+
+					echo "[info] singbox not running"
+
+				else
+
+					# mark singbox as running
+					singbox_running="true"
+
+				fi
+
+				if [[ "${singbox_running}" == "false" ]]; then
+
+					# run script to start microsocks
+					source /home/nobody/singbox.sh
+
+				fi
+
+			fi
+
 		else
 
 			echo "[warn] VPN IP not detected, VPN tunnel maybe down"

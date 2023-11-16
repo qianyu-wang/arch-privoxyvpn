@@ -124,6 +124,14 @@ else
 	export ENABLE_PRIVOXY="no"
 fi
 
+export ENABLE_SINGBOX=$(echo "${ENABLE_SINGBOX}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+if [[ ! -z "${ENABLE_SINGBOX}" ]]; then
+	echo "[info] ENABLE_SINGBOX defined as '${ENABLE_SINGBOX}'" | ts '%Y-%m-%d %H:%M:%.S'
+else
+	echo "[warn] ENABLE_SINGBOX not defined (via -e ENABLE_SINGBOX), defaulting to 'no'" | ts '%Y-%m-%d %H:%M:%.S'
+	export ENABLE_SINGBOX="no"
+fi
+
 if [[ "${ENABLE_SOCKS}" == "yes" ]]; then
 
 	export SOCKS_USER=$(echo "${SOCKS_USER}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
@@ -145,6 +153,19 @@ if [[ "${ENABLE_SOCKS}" == "yes" ]]; then
 		fi
 
 	fi
+fi
+
+if [[ "${ENABLE_SINGBOX}" == "yes" ]]; then
+
+	chmod a+rx /home/nobody/sing-box
+	export SINGBOX_CONFIG=$(echo "${SINGBOX_CONFIG}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+	if [[ ! -z "${SINGBOX_CONFIG}" ]]; then
+		echo "[info] SINGBOX_CONFIG defined as '${SINGBOX_CONFIG}'" | ts '%Y-%m-%d %H:%M:%.S'
+	else
+		echo "[warn] SINGBOX_CONFIG not defined (via -e SINGBOX_CONFIG), defaulting to '/etc/singbox/singbox.json'" | ts '%Y-%m-%d %H:%M:%.S'
+		export SINGBOX_CONFIG="/etc/singbox/singbox.json"
+	fi
+
 fi
 
 export APPLICATION="privoxy"
