@@ -43,8 +43,37 @@ if [ -z "$DOWNLOAD_URL" ]; then
 fi
 curl -L $DOWNLOAD_URL -o latest_sing-box_amd64.tar.gz
 echo "Download completed: latest_sing-box_amd64.tar.gz"
-tar -zxvf "latest_sing-box_amd64.tar.gz" --strip-components=1 -C "/home/nobody" "sing-box-*-linux-amd64/"
-echo "Extraction completed"
+# 假设压缩包的文件名已经保存在一个变量中
+ARCHIVE="latest_sing-box_amd64.tar.gz"
+
+# 解压到的临时目录
+TEMP_DIR="/tmp/sing-box-extract"
+
+# 解压目录的匹配模式，根据实际情况可能需要调整
+DIRECTORY_PATTERN="sing-box-*-linux-amd64"
+
+# 解压到的目标目录
+TARGET_DIR="/home/nobody"
+
+# 创建临时目录并解压全部内容到临时目录
+mkdir -p "$TEMP_DIR"
+tar -zxf "$ARCHIVE" -C "$TEMP_DIR"
+
+# 查找匹配的目录并移动其内容到目标目录
+MATCHED_DIR=$(find "$TEMP_DIR" -type d -name "$DIRECTORY_PATTERN")
+
+if [ ! -z "$MATCHED_DIR" ]; then
+    # 确保目标目录存在
+    mkdir -p "$TARGET_DIR"
+    # 移动文件
+    mv "$MATCHED_DIR"/sing-box "$TARGET_DIR"
+    echo "Files moved to $TARGET_DIR"
+else
+    echo "No matching directory found in the archive."
+fi
+
+# 清理临时目录
+rm -rf "$TEMP_DIR"
 rm -rf latest_sing-box_amd64.tar.gz
 
 # container perms
