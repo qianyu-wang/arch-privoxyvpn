@@ -2,46 +2,21 @@ name: workflow-docker-release
 
 on:
   push:
-    branches:
-      - master
+    tags:
+      - '*'
 
 permissions:
   packages: write
   contents: write
 
 jobs:
-  create-release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Generate Tag
-        id: generate_tag
-        run: echo ::set-output name=generated_tag::$(date +'%Y-%m-%d')-${{ github.run_id }}
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.generate_tag.outputs.generated_tag }}
-          release_name: Release ${{ steps.generate_tag.outputs.generated_tag }}
-          body: |
-            ${{ github.event.head_commit.message }}
-          draft: false
-          prerelease: false
-    outputs:
-      generated_tag: ${{ steps.generate_tag.outputs.generated_tag }}
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-
   build-docker:
-    needs:
-      - create-release
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Docker Build
       run: |
         name=ghcr.io/${{ github.repository_owner }}/arch-privoxyvpn
-        docker build -t $name:latest -t $name:${{ needs.create-release.outputs.generated_tag }} .
+        docker build -t $name:latest .
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
         docker push $name:latest
-        docker push $name:${{ needs.create-release.outputs.generated_tag }}
