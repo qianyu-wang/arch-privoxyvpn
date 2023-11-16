@@ -33,27 +33,18 @@ source aur.sh
 github.sh --install-path "/tmp/compile" --github-owner "rofl0r" --github-repo "microsocks" --compile-src 'make install'
 
 # download sing-box
-# 仓库所有者和仓库名
 REPO_OWNER="SagerNet"
 REPO_NAME="sing-box"
-
-# GitHub API URL 用于获取最新的 release 信息
 API_URL="https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest"
-
-# 使用 curl 获取最新的 release 信息，并使用 jq 解析出所需的 amd64 压缩包的下载链接
 DOWNLOAD_URL=$(curl -s $API_URL | jq -r '.assets[] | select(.name | test("sing-box-.*-linux-amd64.tar.gz")) | .browser_download_url')
-
-# 检查是否获取到了下载链接
 if [ -z "$DOWNLOAD_URL" ]; then
     echo "Download URL not found."
     exit 1
 fi
-
-# 使用 wget 或 curl 下载文件
 curl -L $DOWNLOAD_URL -o latest_sing-box_amd64.tar.gz
 echo "Download completed: latest_sing-box_amd64.tar.gz"
-
-tar -zxvf latest_sing-box_amd64.tar.gz -C /home/nobody
+tar -zxvf "latest_sing-box_amd64.tar.gz" --strip-components=1 -C "/home/nobody" "sing-box-*-linux-amd64/"
+echo "Extraction completed"
 rm -rf latest_sing-box_amd64.tar.gz
 
 # container perms
